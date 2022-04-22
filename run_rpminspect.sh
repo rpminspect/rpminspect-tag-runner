@@ -14,8 +14,9 @@ BEFORE_BUILD="$1"
 [[ -n "${BEFORE_BUILD}" ]] || exit 1
 [[ -n "$2" ]] && AFTER_BUILD="$2"
 
-# Options to run and where we save our run;s logs
-CMD='rpminspect-redhat'
+# Options to run and where we save our run's logs
+# TODO: Make this dynamic based on the tag used
+CMD='rpminspect-centos'
 LOG="logs/${BEFORE_BUILD}.log"
 if [[ -n "${AFTER_BUILD}" ]]; then
     LOG="logs/${BEFORE_BUILD}-${AFTER_BUILD}-comparison.log"
