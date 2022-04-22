@@ -9,7 +9,7 @@ KOJI_TAG='c9s-pending'
 ls logs/*.success > /dev/null || exit 2
 
 for after_build in $(cat logs/*.success); do
-  echo "INFO: Working on ${after_build}"
+  echo "$(date) - INFO: Working on ${after_build}"
 
   # Loop helps with large runs and network issues
   # Not ideal as we could get stuck but so far so good
