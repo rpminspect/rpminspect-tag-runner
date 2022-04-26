@@ -57,7 +57,7 @@ cat ${list} | while read line; do
   # If all slots taken, wait a bit
   while [[ $(jobs -p | wc -l) -ge ${threads} ]]; do
     echo "$(date) - $(jobs -p | wc -l) rpminspect jobs currently running:"
-    ps x | grep 'run_rpminspect'
+    ps x | grep '[r]un_rpminspect.sh'
     sleep 5
   done
 
@@ -71,7 +71,7 @@ done
 # Don't forget the hanging chads
 while [[ $(pgrep -c rpminspect) -gt 0 ]]; do
   echo "$(date) - Waiting for our final jobs to finish"
-  ps x | grep 'run_rpminspect'
+  ps x | grep '[r]un_rpminspect.sh'
   sleep 5
 done
 
