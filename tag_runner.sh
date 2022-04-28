@@ -7,6 +7,13 @@ if [[ $1 == '--help' ]]; then
   exit 1
 fi
 
+# Make sure rpminspect is in out PATH
+which rpminspect > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "ERROR: Cannot find rpminspect in PATH." >&2
+  exit 1
+fi
+
 # Make sure list exists, either as default list.txt
 # or as a user-defined list file
 list='list.txt'
