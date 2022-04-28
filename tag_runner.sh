@@ -9,7 +9,7 @@ fi
 
 # Make sure rpminspect is in out PATH
 which rpminspect > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
   echo "ERROR: Cannot find rpminspect in PATH." >&2
   exit 1
 fi
