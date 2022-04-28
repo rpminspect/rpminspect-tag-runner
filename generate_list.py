@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-
-# Create list of NVRs to test
+# Create list of NVRs to test from a given koji tag
 
 import argparse
 import getpass
@@ -49,10 +48,15 @@ def get_list_tagged_packages(koji_url, koji_tag):
 
 
 def save_to_file(file_name, list_tagged_packages):
+    results = []
     logger.info(f"Saving list of tagged packages to the file {file_name}")
+    # Sort the results alphabetically to have an idea of how far along the run is
+    for tagged_package in list_tagged_packages:
+        results.append(tagged_package['nvr'])
+    results.sort()
+    # Join the list with newlines and add a trailing newline as well
     with open(file_name, 'w') as file:
-        for tagged_package in list_tagged_packages:
-            file.write(f"{tagged_package['nvr']}\n")
+        file.write('\n'.join(results) + '\n')
     logger.info(f"All packages was saved to the file {file_name}")
 
 
