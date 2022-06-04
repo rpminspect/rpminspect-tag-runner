@@ -12,4 +12,4 @@ To run:
 5. Watch tag_runner.sh or tail run.log for less noise
 6. Run generate-comparisons.sh
 7. Run tag_runner.sh comparison-list.txt
-8. Look at logs/*comparison*success results for NVRs ready to opt-out
+8. Run generate-results.sh to see which packages have passed comparison inspections
