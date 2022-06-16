@@ -24,10 +24,11 @@ fi
 [[ -d logs ]] || mkdir logs
 OPTS="-s VERIFY -w mytmp -o $LOG"
 
-# Do the thing and time it
+# Start the run and time it
 FULL_CMD="$CMD $OPTS ${BEFORE_BUILD} ${AFTER_BUILD}"
 echo "${FULL_CMD}" > ${LOG}.command
-date >> ${LOG}.runtime
+STARTTIME=$(date +'%s')
+echo ${STARTTIME} > ${LOG}.starttime
 
 # pipefail needed if we want to use tee and keep $?
 set -o pipefail
@@ -41,6 +42,10 @@ else
     echo ${EC} > ${LOG}.exitcode
 fi
 
-# Wrap it up
-date >> ${LOG}.runtime
+# Wrap up our runtime logging
+ENDTIME=$(date +'%s')
+echo ${ENDTIME} > ${LOG}.endtime
+echo $((${ENDTIME} - ${STARTTIME})) > ${LOG}.runtime
+
+# All done
 exit $EC
