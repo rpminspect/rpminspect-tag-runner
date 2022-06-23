@@ -28,9 +28,19 @@ if nvr in data:
 # Fetch from koji and abort if missing
 koji_url = "https://kojihub.stream.centos.org/kojihub"
 session = koji.ClientSession(koji_url)
-try:
-    result = session.getBuild(nvr)['package_name']
-except:
+
+# Sometimes koji times out for no discernible reason
+# TODO: Validate exception for timeout vs missing key
+result = None
+count = 0
+while not result and count < 5:
+    try:
+        result = session.getBuild(nvr)['package_name']
+    except:
+        count += 1
+        continue
+
+if not result:
     print(f"Failed to find package name for {nvr}")
     sys.exit(1)
 
