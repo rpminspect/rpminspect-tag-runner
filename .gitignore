@@ -1,4 +1,5 @@
 logs/
+mytmp/
 list.txt
 nvr-to-package.json
 comparison-list.txt
