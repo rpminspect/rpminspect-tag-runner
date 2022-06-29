@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 import json
 import koji
+import os
 import sys
 
 # TODO: getopts would be nice
+#       also might support profiles for koji_url
 if len(sys.argv) != 2:
     print("ERROR: please provide an nvr.")
     sys.exit(1)
@@ -26,7 +28,11 @@ if nvr in data:
     sys.exit(0)
 
 # Fetch from koji and abort if missing
-koji_url = "https://kojihub.stream.centos.org/kojihub"
+koji_url = os.environ.get('KOJI_URL')
+if not koji_url:
+    print("ERROR: required environment variable KOJI_URL is missing")
+    sys.exit(1)
+
 session = koji.ClientSession(koji_url)
 
 # Sometimes koji times out for no discernible reason
