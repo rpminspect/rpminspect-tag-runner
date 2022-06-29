@@ -14,9 +14,13 @@ BEFORE_BUILD="$1"
 [[ -n "${BEFORE_BUILD}" ]] || exit 1
 [[ -n "$2" ]] && AFTER_BUILD="$2"
 
+# tag_runner.sh should source and export from our profile
+if [[ -z "$RPMINSPECT_CMD" ]]; then
+    echo "ERROR: Required environment variable 'RPMINSPECT_CMD' missing." >&2
+    exit 1
+fi
+
 # Options to run and where we save our run's logs
-# TODO: Make this dynamic based on the tag used
-CMD='rpminspect-centos'
 LOG="logs/${BEFORE_BUILD}.log"
 if [[ -n "${AFTER_BUILD}" ]]; then
     LOG="logs/${BEFORE_BUILD}-${AFTER_BUILD}-comparison.log"
@@ -25,7 +29,7 @@ fi
 OPTS="-s VERIFY -w mytmp -o $LOG"
 
 # Start the run and time it
-FULL_CMD="$CMD $OPTS ${BEFORE_BUILD} ${AFTER_BUILD}"
+FULL_CMD="$RPMINSPECT_CMD $OPTS ${BEFORE_BUILD} ${AFTER_BUILD}"
 echo "${FULL_CMD}" > ${LOG}.command
 STARTTIME=$(date +'%s')
 echo ${STARTTIME} > ${LOG}.starttime
