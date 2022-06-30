@@ -134,7 +134,7 @@ done
 
 # If all jobs are done and conditions are met, let's run our comparisons
 if [[ ${auto_run_comp} == 'true' ]]; then
-    ${0} ${comp_list}
+    ${0} -f ${comp_list}
 fi
 
 # All done
