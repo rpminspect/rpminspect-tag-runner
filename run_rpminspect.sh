@@ -51,10 +51,10 @@ ${FULL_CMD} 2>${LOG}.stderr | tee ${LOG}.stdout
 EC=$?
 if [[ ${EC} -eq 0 ]]; then
     echo "${BEFORE_BUILD} ${AFTER_BUILD}" > ${LOG}.success
-    echo "${BEFORE_BUILD} ${AFTER_BUILD}" > ${PASS_LIST}
+    echo "${BEFORE_BUILD} ${AFTER_BUILD}" >> ${PASS_LIST}
 else
     echo ${EC} > ${LOG}.exitcode
-    echo "${BEFORE_BUILD} ${AFTER_BUILD}" > ${FAIL_LIST}
+    echo "${BEFORE_BUILD} ${AFTER_BUILD}" >> ${FAIL_LIST}
 fi
 
 # Wrap up our runtime logging
