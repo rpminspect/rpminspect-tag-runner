@@ -132,11 +132,13 @@ while [[ $(pgrep -c rpminspect) -gt 0 ]]; do
   sleep 5
 done
 
+# Print the completion before the auto re-run
+echo "$(date) - Run completed."
+
 # If all jobs are done and conditions are met, let's run our comparisons
 if [[ ${auto_run_comp} == 'true' ]]; then
     ${0} -f ${comp_list}
 fi
 
 # All done
-echo "$(date) - Run completed."
 exit 0
