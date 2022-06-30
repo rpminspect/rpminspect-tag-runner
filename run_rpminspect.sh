@@ -81,13 +81,12 @@ if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
       exit $EC
     fi
     # Now we need to find the previous build, if it exists, and add to our comp list
-    # The "before" build becomes the after if we find an older one. It can be a bit
-    # confusing as we call it BEFORE if it's our only NVR.
-    for NEW_BUILD in $BUILDS; do
-    if [ "${NEW_BUILDS}" != "${BEFORE_BUILD}" ]; then
-        echo "${NEW_BUILDS} ${BEFORE_BUILD}" >> comparison-list.txt
-        break
-    fi
+    # The "before" build becomes the after if we find an older one.
+    for OLD_BUILD in $BUILDS; do
+        if [ "${OLD_BUILD}" != "${BEFORE_BUILD}" ]; then
+            echo "${OLD_BUILD} ${BEFORE_BUILD}" >> comparison-list.txt
+            break
+        fi
     done
 
 fi
