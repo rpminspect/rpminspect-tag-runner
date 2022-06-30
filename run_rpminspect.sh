@@ -63,7 +63,7 @@ echo ${ENDTIME} > ${LOG}.endtime
 echo $((${ENDTIME} - ${STARTTIME})) > ${LOG}.runtime
 
 # If we in inspection OP_MODE then let's prepare for the comparison run
-if [[ "${OP_MODE}" == 'inspection' -a "${ec}" -eq 0 ]]; then
+if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
     # Find package via NVR by polling koji API for the info
     # Failure handling and looping should be handled in the python script
     PACKAGE=$(./nvr-to-package.py ${BEFORE_BUILD})
