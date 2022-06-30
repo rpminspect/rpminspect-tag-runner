@@ -12,7 +12,6 @@ usage() {
 
 # Check for user specified options
 while getopts ":f:ht:p:" arg; do
-#while getopts "fhtp" arg; do
   case "${arg}" in
     f)
       list="${OPTARG}"
@@ -34,7 +33,7 @@ done
 
 shift "$(($OPTIND - 1))"
 
-# TODO: Make getopts habndle this.
+# TODO: Make getopts handle this.
 # I just want to keep moving forward on the refactoring for now.
 if [[ $# -ne 0 ]]; then
     echo "ERROR: $# unexpected options still left. Exiting." >&2
@@ -51,9 +50,11 @@ fi
 # Define the default and generate our list if missing
 if [[ -z "${list}" ]]; then 
   list="list.txt"
+  comp_list='comparison-list.txt'
+  auto_run_comp='false'
+  # If no args or default files, setup for a re-run at the end
   [[ -e ${list} ]] || ./generate-list.sh -p ${profile}
-  # Allow our upstream script to fail
-  [[ $? -ne 0 ]] && exit 1
+  [[ -e ${comp_list} ]] || auto_run_comp='true'
 fi 
 
 # Validations against our inputs
@@ -75,8 +76,8 @@ if [[ $? -ne 0 ]]; then
   exit 1
 # Validate all required vars are present
 elif [[ -z "${KOJI_CMD}" ]] || \
-     [[ -z "${KOJI_CMD}" ]] || \
-     [[ -z "${KOJI_CMD}" ]] || \
+     [[ -z "${KOJI_TAG}" ]] || \
+     [[ -z "${KOJI_URL}" ]] || \
      [[ -z "${RPMINSPECT_CMD}" ]]; then
   echo "ERROR: profile ${profile} is missing required KOJI value(s)." >&2
   exit 1
@@ -130,6 +131,11 @@ while [[ $(pgrep -c rpminspect) -gt 0 ]]; do
   ps x | grep '[r]un_rpminspect.sh'
   sleep 5
 done
+
+# If all jobs are done and conditions are met, let's run our comparisons
+if [[ ${auto_run_comp} == 'true' ]]; then
+    ${0} ${comp_list}
+fi
 
 # All done
 echo "$(date) - Run completed."
