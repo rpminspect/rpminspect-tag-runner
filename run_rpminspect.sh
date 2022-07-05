@@ -84,7 +84,6 @@ if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
     # The "before" build becomes the after if we find an older one.
     if [ "${OLD_BUILD}" != "${BEFORE_BUILD}" ]; then
       echo "${OLD_BUILD} ${BEFORE_BUILD}" >> comparison-list.txt
-      break
     # Capture a list of successful inspection only packages
     else
       echo "${PACKAGE}" >> inspection-only-pass.txt
