@@ -82,7 +82,7 @@ if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
     fi
     # Now we need to find the previous build, if it exists, and add to our comp list
     # The "before" build becomes the after if we find an older one.
-    if [ "${OLD_BUILD}" != "${BEFORE_BUILD}" ]; then
+    if [[ "${OLD_BUILD}" != "${BEFORE_BUILD}" ]]; then
       echo "${OLD_BUILD} ${BEFORE_BUILD}" >> comparison-list.txt
     # Capture a list of successful inspection only packages
     else
