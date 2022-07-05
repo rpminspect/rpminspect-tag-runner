@@ -74,21 +74,21 @@ if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
       exit $EC
     fi
     # Ask koji via cli for last 2 tagged builds for a package on the tag 
-    BUILDS=$(${KOJI_CMD} list-tagged --latest-n 2 --inherit --quiet ${KOJI_TAG} ${PACKAGE} | awk '{print $1}' | xargs)
-    if [[ -z "${BUILDS}" ]]; then
+    OLD_BUILD=$(${KOJI_CMD} list-tagged --latest-n 2 --inherit --quiet ${KOJI_TAG} ${PACKAGE} | awk '{print $1}' | tail -n 1)
+    if [[ -z "${OLD_BUILD}" ]]; then
       echo "$(date) - ERROR: KOJI_CMD to NVRs logic broke on ${PACKAGE} - please investigate." >&2
-      echo "$PACKAGE" >> comparison-generation-failure.log
+      echo "${PACKAGE}" >> comparison-generation-failure.log
       exit $EC
     fi
     # Now we need to find the previous build, if it exists, and add to our comp list
     # The "before" build becomes the after if we find an older one.
-    for OLD_BUILD in $BUILDS; do
-        if [ "${OLD_BUILD}" != "${BEFORE_BUILD}" ]; then
-            echo "${OLD_BUILD} ${BEFORE_BUILD}" >> comparison-list.txt
-            break
-        fi
-    done
-
+    if [ "${OLD_BUILD}" != "${BEFORE_BUILD}" ]; then
+      echo "${OLD_BUILD} ${BEFORE_BUILD}" >> comparison-list.txt
+      break
+    # Capture a list of successful inspection only packages
+    else
+      echo "${PACKAGE}" >> inspection-only-pass.txt
+    fi
 fi
 
 # All done
