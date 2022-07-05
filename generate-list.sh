@@ -1,10 +1,17 @@
 #!/bin/bash
 # Create list of NVRs to test
 
-# TODO: Make this dynamic between products
-KOJI_CMD='koji -p stream'
-KOJI_TAG='c9s-pending'
+# This could be moved to stdout or a value passed as an argument
 LIST='list.txt'
+
+# These should be exported by tag_runner at runtime
+if [[ -z "${KOJI_CMD}" ]]; then
+  echo "ERROR: KOJI_CMD value from profile is missing." >&2
+  exit 1
+elif [[ -z "${KOJI_TAG}" ]]; then
+  echo "ERROR: KOJI_TAG value from profile is missing." >&2
+  exit 1
+fi
 
 # Required to properly catch KOJI_CMD failures
 set -o pipefail

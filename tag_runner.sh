@@ -47,6 +47,20 @@ fi
 [[ -z "${threads}" ]] && threads=0
 [[ -z "${profile}" ]] && profile="c9s"
 
+# Try to import instead of looking for the file
+source profiles/${profile}.sh
+if [[ $? -ne 0 ]]; then
+  echo "ERROR: Unable to load profile ${profile}" >&2
+  exit 1
+# Validate all required vars are present
+elif [[ -z "${KOJI_CMD}" ]] || \
+     [[ -z "${KOJI_TAG}" ]] || \
+     [[ -z "${KOJI_URL}" ]] || \
+     [[ -z "${RPMINSPECT_CMD}" ]]; then
+  echo "ERROR: profile ${profile} is missing required KOJI value(s)." >&2
+  exit 1
+fi
+
 # Define the default and generate our list if missing
 if [[ -z "${list}" ]]; then 
   list="list.txt"
@@ -66,20 +80,6 @@ if ! [[ -e "${list}" ]]; then
 elif ! [[ $threads =~ ${re} ]]; then
   echo "ERROR: Threads should be a numeric value." >&2
   usage
-  exit 1
-fi
-
-# Try to import instead of looking for the file
-source profiles/${profile}.sh
-if [[ $? -ne 0 ]]; then
-  echo "ERROR: Unable to load profile ${profile}" >&2
-  exit 1
-# Validate all required vars are present
-elif [[ -z "${KOJI_CMD}" ]] || \
-     [[ -z "${KOJI_TAG}" ]] || \
-     [[ -z "${KOJI_URL}" ]] || \
-     [[ -z "${RPMINSPECT_CMD}" ]]; then
-  echo "ERROR: profile ${profile} is missing required KOJI value(s)." >&2
   exit 1
 fi
 
