@@ -115,7 +115,7 @@ cat ${list} | while read line; do
   while [[ $(jobs -p | wc -l) -ge ${threads} ]]; do
     echo "$(date) - $(jobs -p | wc -l) rpminspect jobs currently running:"
     ps x | grep '[r]un_rpminspect.sh'
-    sleep 5
+    sleep 1
   done
 
   # Start a thread up when available with a tiny pause to stagger initial startup
