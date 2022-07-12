@@ -19,7 +19,7 @@ set -o pipefail
 # Hide the ugly error messages from the user
 # DeprecationWarning: The stub function for translation is no longer used
 echo "$(date) - INFO: Generating ${LIST}"
-${KOJI_CMD} list-tagged --inherit --latest ${KOJI_TAG} 2>/dev/null | tail -n +3 | awk '{print $1}' > ${LIST}
+${KOJI_CMD} list-tagged --inherit --latest ${KOJI_TAG} 2>/dev/null | tail -n +3 | awk '{print $1}' | sort > ${LIST}
 
 # Check if KOJI_CMD is installed
 ec="$?"
