@@ -1,10 +1,45 @@
 #!/bin/bash
-# Create list of NVRs to test
+# Create a list of NVRs to test tag_runner against
 
-# This could be moved to stdout or a value passed as an argument
-LIST='list.txt'
+# Check for user specified options
+while getopts "e:f:p:" arg; do
+  case "${arg}" in
+    # File with list of packages to exclude from our list
+    e)
+      EXCLUDES="${OPTARG}"
+      ;;
+    # File with our list of packages to test
+    f)
+      LIST="${OPTARG}"
+      ;;
+    # Profile to load in profiles/ 
+    p)
+      PROFILE="${OPTARG}"
+      ;;
+    *)
+      echo "ERROR: Unknown argument: '${OPTARG}'" >&2
+      exit 1
+      ;;
+  esac
+done
 
-# These should be exported by tag_runner at runtime
+shift "$(($OPTIND - 1))"
+
+# Defaults to list.txt
+[[ -z "${LIST}" ]] && LIST='list.txt'
+
+# This is mostly used when debugging or testing as tag_runner exports
+# the required values
+if [[ -n "${PROFILE}" ]]; then
+  source profiles/${PROFILE}.sh
+  if [[ $? -ne 0 ]]; then
+    echo "ERROR: Unable to load profile ${PROFILE}." >&2
+    exit 1
+  fi
+fi
+
+# These should be exported by tag_runner at runtime and can exist without
+# a profile specified, but we check to avoid breaking the workflow
 if [[ -z "${KOJI_CMD}" ]]; then
   echo "ERROR: KOJI_CMD value from profile is missing." >&2
   exit 1
@@ -18,7 +53,7 @@ set -o pipefail
 
 # Hide the ugly error messages from the user
 # DeprecationWarning: The stub function for translation is no longer used
-echo "$(date) - INFO: Generating ${LIST}"
+echo "$(date) - INFO: Generating ${LIST} for ${KOJI_TAG}"
 ${KOJI_CMD} list-tagged --inherit --latest ${KOJI_TAG} 2>/dev/null | tail -n +3 | awk '{print $1}' | sort > ${LIST}
 
 # Check if KOJI_CMD is installed
@@ -37,5 +72,5 @@ elif [[ ! -s ${LIST} ]]; then
   exit 1
 fi
 
-echo "$(date) - INFO: ${LIST} generated successfully."
+echo "$(date) - INFO: Generated ${LIST} successfully for ${KOJI_TAG}"
 exit 0
