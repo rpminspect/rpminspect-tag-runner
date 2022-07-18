@@ -142,7 +142,7 @@ cat ${list} | while read line; do
 done
 
 # Don't forget the hanging chads
-while [[ $(pgrep -c run_rpminspect.sh) -gt 0 ]]; do
+while [[ $(ps x | grep -c '[r]un_rpminspect.sh') -gt 0 ]]; do
   echo "$(date) - Waiting for our final jobs to finish"
   ps x | grep '[r]un_rpminspect.sh'
   sleep 5
