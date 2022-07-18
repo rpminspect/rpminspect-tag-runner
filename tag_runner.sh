@@ -11,7 +11,7 @@ usage() {
 }
 
 # Check for user specified options
-while getopts ":f:ht:p:" arg; do
+while getopts ":f:ht:p:e:" arg; do
   case "${arg}" in
     f)
       list="${OPTARG}"
@@ -21,6 +21,9 @@ while getopts ":f:ht:p:" arg; do
       ;;
     p)
       profile="${OPTARG}"
+      ;;
+    e)
+      excludes="${OPTARG}"
       ;;
     h)
       usage && exit 0
@@ -61,13 +64,26 @@ elif [[ -z "${KOJI_CMD}" ]] || \
   exit 1
 fi
 
-# Define the default and generate our list if missing
+# If an excludes is defined, make sure it exists
+if [[ -n "${excludes}" ]] && ! [[ -s "${excludes}" ]]; then
+  echo "ERROR: Defined excludes file is missing." >&2
+  usage
+  exit 1
+fi
+
+# Define the defaults and generate our list of builds if none exists
 if [[ -z "${list}" ]]; then 
   list="list.txt"
   comp_list='comparison-list.txt'
   auto_run_comp='false'
-  # If no args or default files, setup for a re-run at the end
-  [[ -e ${list} ]] || ./generate-list.sh -p ${profile}
+
+  # A profile is required, but we can add more opts if requested
+  gen_list_opts="-p ${profile}"
+  [[ -n "${excludes}" ]] && gen_list_opts="${gen_list_opts} -e ${excludes}"
+
+  # If no list.txt exists, generate one
+  [[ -e ${list} ]] || ./generate-list.sh ${gen_list_opts}
+  # If no comparison file, let's create one on successful inspections
   [[ -e ${comp_list} ]] || auto_run_comp='true'
 fi 
 
