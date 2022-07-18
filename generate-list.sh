@@ -48,6 +48,12 @@ elif [[ -z "${KOJI_TAG}" ]]; then
   exit 1
 fi
 
+# Validate we have an excludes file if defined
+if [[ -n "${EXCLUDES}" ]] && [[ ! -s "${EXCLUDES}" ]]; then
+  echo "ERROR: Excludes file ${EXCLUDES} is missing." >&2
+  exit 1
+fi
+
 # Required to properly catch KOJI_CMD failures
 set -o pipefail
 
@@ -70,6 +76,50 @@ if [[ ${ec} -ne 0 ]]; then
 elif [[ ! -s ${LIST} ]]; then
   echo "ERROR: requested tag appers to be empty." >&2
   exit 1
+fi
+
+# Process excludes if requested
+if [[ -n "${EXCLUDES}" ]]; then
+  # Where to store the "new" list
+  LISTTMP="${LIST}.tmp"
+  # Purge the tmp if one already exists
+  [[ -s ${LISTTMP} ]] && rm -f ${LISTTMP}
+  # Stats are nice to see
+  LIST_SIZE=$(wc -l < ${LIST})
+  EXCLUSION_SIZE=$(wc -l < ${EXCLUDES})
+  echo -n "$(date) - INFO: Processing ${EXCLUSION_SIZE} exclusions against ${LIST_SIZE} builds..."
+
+  # Start at the NVR level in our generated list
+  for nvr in $(cat ${LIST}); do
+    package=''
+    excluded=''
+    # Excludes are packaged based, not NVR based, so we need to translate NVR to package
+    # These sometimes timeout, so we use a while loop. We can add a loop counter to avoid
+    # unlimited loops if desired.
+    while [[ -z "${package}" ]]; do
+      package=$(./nvr-to-package.py $nvr)
+      [[ -z "${package}" ]] && echo "INFO: nvr to package failed for ${nvr} - retrying..."
+    done
+    # Using grep creates fun problems with special characters (- and + to name 2),
+    # so we simply do a readline and look for a full match between them.
+    #
+    # No sorting is done as we want to preserve list.txt's original sort order
+    while read -r line; do
+      if [[ "${line}" == ${package} ]]; then
+        excluded=true
+        break
+      fi
+    done < ${EXCLUDES}
+    # If excluded is still undefined, it was not in our excludes list
+    # so we can keep it around
+    [[ -z "${excluded}" ]] && echo "${nvr}" >> ${LISTTMP}
+  done
+
+  # Grab some quic before/after stats and swap in the new list
+  mv -f ${LISTTMP} ${LIST}
+  NEW_LIST_SIZE=$(wc -l < ${LIST})
+  echo 'done.'
+  echo "$(date) - INFO: Final list size: ${NEW_LIST_SIZE}"
 fi
 
 echo "$(date) - INFO: Generated ${LIST} successfully for ${KOJI_TAG}"
