@@ -153,7 +153,7 @@ echo "$(date) - Run completed."
 
 # If all jobs are done and conditions are met, let's run our comparisons
 if [[ ${auto_run_comp} == 'true' ]] && [[ -s ${comp_list} ]]; then
-    ${0} -f ${comp_list} -p ${profile}
+    ${0} -f ${comp_list} -p ${profile} -t ${threads}
 fi
 
 # All done
