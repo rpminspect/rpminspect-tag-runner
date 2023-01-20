@@ -63,7 +63,7 @@ echo ${ENDTIME} > ${LOG}.endtime
 echo $((${ENDTIME} - ${STARTTIME})) > ${LOG}.runtime
 
 # If we in inspection OP_MODE then let's prepare for the comparison run
-if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
+if [[ "${OP_MODE}" == 'inspection' ]]; then
     # Find package via NVR by polling koji API for the info
     # Failure handling and looping should be handled in the python script
     PACKAGE=$(./nvr-to-package.py ${BEFORE_BUILD})
@@ -90,8 +90,6 @@ if [[ "${OP_MODE}" == 'inspection' ]] && [[ "${EC}" -eq 0 ]]; then
         break
       fi
     done
-    # Capture a list of successful inspection only packages
-    [[ "${OLD_BUILD_FOUND}" == 'true' ]] || echo "${PACKAGE}" >> inspection-only-pass.txt
 fi
 
 # All done
